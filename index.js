@@ -1,7 +1,7 @@
 const wsSlider = {
 	container: '.ws-slider__container', //Основной блок
 	slidIn: 4, //Сколько слайдов выводить
-	margins: '20', // Отступы у слайдов
+	margins: '0', // Отступы у слайдов
 	pagination: true, // Надо ли пагинация
 	content: '.ws-slider__content', //Блок в котором лежал слайны и навигация(поумлочанию там навигационные кнопки)
 	slideWrap: '.ws-slider__wrap', // Обертка слайдов
@@ -19,6 +19,7 @@ const wsSlider = {
 	autoAdaptive340: ['340', '1'],
 }
 
+let mainObj = wsSlider;
 /**
  * Документация к wsSlider:
  * 
@@ -44,14 +45,11 @@ const wsSlider = {
  * .ws-slider__pg-active
 */
 
-const $container = document.querySelector(wsSlider.container);
-// const $btnBack = $container.querySelector(wsSlider.slideBack);
-// const $btnNext = $container.querySelector(wsSlider.slideNext);
-const $SliderBlock = $container.querySelector(wsSlider.content);
-const $slideWrap = $container.querySelector(wsSlider.slideWrap);
-const $slides = $container.querySelectorAll(wsSlider.slides);
-const $paginationSelector = $container.querySelector(wsSlider.paginationSelector);
-// const $domEl = $container.querySelector('wsSlider.');
+const $container = document.querySelector(mainObj.container);
+const $SliderBlock = $container.querySelector(mainObj.content);
+const $slideWrap = $container.querySelector(mainObj.slideWrap);
+const $slides = $container.querySelectorAll(mainObj.slides);
+const $paginationSelector = $container.querySelector(mainObj.paginationSelector);
 
 let slidesLength = $slides.length;
 let widthWrap = Number($SliderBlock.clientWidth);
@@ -67,30 +65,29 @@ function sliderIteratingAndChangeCssVar(selector, nameVars, valueVars, varsStr =
 
 // Генирация пагинации слайдера
 function renderPagination(selector){
-	for (let i = 0; i < slidesLength; i++) {
+	for (let i = 0; i < (Number(slidesLength) - Number(mainObj.slidIn) + 1); i++) {
 		let span = document.createElement('span');
 		span.className = "ws-slider__pg-items";
 		selector.prepend(span);
 	}
-	$container.querySelector('.ws-slider__pg-items').classList.add('ws-slider__pg-active')
 };
 renderPagination($paginationSelector);
 
 
 // Добавлен отступов между слайдами
-function margens(margins = wsSlider.margins) {
+function margens(margins = mainObj.margins) {
 	
 	if(margins !== '0'){
 		return sliderIteratingAndChangeCssVar($slides, '--ws-slides--margin', margins, 'px');
 	}
 }
-margens(wsSlider.margins);
+margens(mainObj.margins);
 
 
 // Просчет ширины слайдов
 function slidesWidth(wrap) {
-	let marginValue = Number(wsSlider.margins);
-	let slideQuantity =  Number(wsSlider.slidIn);
+	let marginValue = Number(mainObj.margins);
+	let slideQuantity =  Number(mainObj.slidIn);
 	let widthSlid = (widthWrap / slideQuantity)
 	if(marginValue !== 0){
 		let sumWidth = (widthWrap - ((slideQuantity -1) * marginValue)) / slideQuantity;
@@ -104,26 +101,26 @@ slidesWidth($SliderBlock);
 
 // Автоматический адаптив
 function sliderAutoAdaptive(widthValue) {
-	if(widthValue <= +wsSlider.autoAdaptive340[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive340[1];
+	if(widthValue <= Number(mainObj.autoAdaptive340[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive340[1];
 	}
-	if(widthValue <= +wsSlider.autoAdaptive480[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive480[1];
+	if(widthValue <= Number(mainObj.autoAdaptive480[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive480[1];
 	}
-	if(widthValue <= +wsSlider.autoAdaptive580[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive580[1];
+	if(widthValue <= Number(mainObj.autoAdaptive580[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive580[1];
 	}
-	if(widthValue <= +wsSlider.autoAdaptive620[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive620[1];
+	if(widthValue <= Number(mainObj.autoAdaptive620[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive620[1];
 	}
-	if(widthValue <= +wsSlider.autoAdaptive780[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive780[1];
+	if(widthValue <= Number(mainObj.autoAdaptive780[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive780[1];
 	}
-	if(widthValue <= +wsSlider.autoAdaptive980[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive980[1];
+	if(widthValue <= Number(mainObj.autoAdaptive980[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive980[1];
 	}
-	if(widthValue <= +wsSlider.autoAdaptive1040[0]){
-		return wsSlider.slidIn = wsSlider.autoAdaptive1040[1];
+	if(widthValue <= Number(mainObj.autoAdaptive1040[0])){
+		return mainObj.slidIn = mainObj.autoAdaptive1040[1];
 	}
 }
 
@@ -131,10 +128,10 @@ function sliderAutoAdaptive(widthValue) {
 // События клиск
 function sliderEvents(selector){
 	selector.addEventListener('click', ()=>{
-		if(event.target.classList.contains(wsSlider.slideNext)){
+		if(event.target.classList.contains(mainObj.slideNext)){
 			slideNext()
 		}
-		if(event.target.classList.contains(wsSlider.slideBack)){
+		if(event.target.classList.contains(mainObj.slideBack)){
 			slideBack()
 		}
 	});
@@ -144,24 +141,46 @@ sliderEvents($container)
 // Перелистываение сдйдов
 {
 
-let valueLength = Number(slidesLength) - Number(wsSlider.slidIn);
+let valueLength = Number(slidesLength) - Number(mainObj.slidIn);
 let countLength = valueLength;
 let count = 0;
+let id = 0;
+let idPg = id;
+
+let marginsNum = Number(mainObj.margins);
+let shiftValue = Number($slides[0].clientWidth) + marginsNum;
+let shiftCount = 0;
 
 function slideNext(){
-	if(count < valueLength){}
-		countLength--;
+	if(count < valueLength){
+		idPg++;
 		count++;
-		console.log('valueLength',valueLength);
-		console.log('Count = ',count);
+		countLength--;
+		paginstionCouunt(idPg);
+		shiftCount = (shiftCount + shiftValue);
+		$slideWrap.style.left = `-${shiftCount}px`;
+	}
 };
 function slideBack(){
-	if(countLength < valueLength)
+	if(countLength < valueLength){
 		countLength++;
-		count++;
-		console.log('valueLength',valueLength);
-		console.log('Count = ',count);
+		count--;
+		idPg--;
+		paginstionCouunt(idPg);
+		shiftCount = shiftCount - shiftValue;
+		$slideWrap.style.left = `-${shiftCount}px`;
+	}
 };
+
+//Пагинация
+function paginstionCouunt(idndex = id){
+	let items = $paginationSelector.querySelectorAll('.ws-slider__pg-items');
+	items.forEach(function(i) {
+		i.classList.remove('ws-slider__pg-active');
+	});
+	items[idndex].classList.add('ws-slider__pg-active');
+}
+paginstionCouunt();
 
 }
 

@@ -51,7 +51,6 @@
 	object-fit: cover;
 }
 .ws-slider__slides{
-	border: 1px solid #000;
 	width: var(--ws-slides--width);
 	height: var(--ws-slides--height);
 	margin-right: var(--ws-slides--margin);
